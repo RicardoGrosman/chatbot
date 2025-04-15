@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Bot da Roça</title>
+    <style>
+        body {
+            background-color: #f9f5e3;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #4b2c0d;
+        }
+        #chatbox {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background: #fff8dc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px #aaa;
+        }
+        .bot, .user {
+            margin-bottom: 10px;
+        }
+        .bot {
+            color: #228B22;
+        }
+        .user {
+            text-align: right;
+            color: #00008B;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatbox">
+        <img src="{{ url_for('static', filename='botdaroca2.png') }}" alt="Bot da Roça" style="width: 100%; border-radius: 10px; margin-bottom: 15px;">
+        <h2>Bot da Roça 🍲</h2>
+        <div id="conversation"></div>
+        <input type="text" id="user_input" placeholder="Digite sua pergunta aqui...">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById("user_input").value;
+            if (userInput.trim() === "") return;
+
+            const chatDiv = document.getElementById("conversation");
+            chatDiv.innerHTML += `<div class="user"><strong>Você:</strong> ${userInput}</div>`;
+
+            const response = await fetch("/get", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ msg: userInput })
+            });
+
+            const data = await response.json();
+            chatDiv.innerHTML += `<div class="bot"><strong>Bot da Roça:</strong> ${data.response}</div>`;
+            document.getElementById("user_input").value = "";
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+
+        // Adicionando o event listener para a tecla Enter
+        document.getElementById("user_input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
